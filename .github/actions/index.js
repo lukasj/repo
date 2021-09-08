@@ -183,7 +183,7 @@ async function run() {
 //  - [ ] No other files (e.g., no jakarta_ee_logo_schooner_color_stacked_default.png)
         review += mark("No other files (e.g., no jakarta_ee_logo_schooner_color_stacked_default.png)",
             3 === specFiles.length,
-            "Found " + specFiles.length + " files");
+            "Found " + specFiles.length + " files, expected 3");
 //  - [ ] Staging repository link of the form https://jakarta.oss.sonatype.org/content/repositories/staging/jakarta/{spec}/jakarta.{spec}-api/x.y.z/
         let entry = getEntry(pr_description, "The URL of the OSSRH staging repository for the api, javadoc:");
         let userInput = getInputFromEntry(entry);
@@ -203,7 +203,7 @@ async function run() {
                 && ("jakarta." + spec.name + "-api") === pathComponents[1]
                 && pathComponents[2].startsWith(spec.version))) {
                 if (result) {
-                    comment = "Provided URL exists but does not match expected pattern";
+                    comment = "Is '" + userInput.substring(baseUrl.length + 1) + "' correct? It exists but does not follow expected pattern.";
                 }
                 result = false;
             } else {
@@ -235,7 +235,12 @@ async function run() {
                 && pathComponents[2].startsWith("jakarta")
                 && pathComponents[2].endsWith(".zip"))) {
                 if (result) {
-                    comment = "Provided URL exists but does not match expected pattern";
+                    let tckName = pathComponents[2];
+                    if (tckName.indexOf(spec.name) > 7) {
+                        comment = "Provided URL exists but " + tckName + " does not match expected pattern";
+                    } else {
+                        comment = "Is '" + userInput.substring(baseUrl.length + 1) + "' correct? It exists but does not follow expected pattern.";
+                    }
                 }
                 result = false;
             } else {
@@ -282,7 +287,7 @@ async function run() {
             }
         }
         review += mark("Compatibility certification link of the form https://github.com/eclipse-ee4j/{project}/#{issue}",
-            result, comment);
+            result, result ? "I can not say this is correct or not" : comment);
 
 //  - [ ] (Optional) Second PR for just apidocs
         if (10 < javadocFiles.length) {
