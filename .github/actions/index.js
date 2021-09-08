@@ -235,19 +235,20 @@ async function run() {
                 && pathComponents[2].startsWith("jakarta")
                 && pathComponents[2].endsWith(".zip"))) {
                 if (result) {
-                    let tckName = pathComponents[2];
-                    if (tckName.indexOf(spec.name) > 7) {
-                        comment = "Provided URL exists but " + tckName + " does not match expected pattern";
-                    } else {
-                        comment = "Is '" + userInput.substring(baseUrl.length + 1) + "' correct? It exists but does not follow expected pattern.";
-                    }
+                    comment = "Provided URL exists but does not match expected pattern";
                 }
                 result = false;
             } else {
                 if (!result) {
                     comment = "Provided URL matches the pattern but the target does not exist";
                 } else {
-                    result = true;
+                    let tckName = pathComponents[2];
+                    if (tckName.indexOf(spec.name) > 7) {
+                        result = true;
+                    } else {
+                        comment = "Provided URL exists but " + tckName + " does not match expected pattern";
+                        result = false;
+                    }
                 }
             }
         }
@@ -287,7 +288,7 @@ async function run() {
             }
         }
         review += mark("Compatibility certification link of the form https://github.com/eclipse-ee4j/{project}/#{issue}",
-            result, result ? "I can not say this is correct or not" : comment);
+            result, result ? "I can not say this is correct or not" : comment, true);
 
 //  - [ ] (Optional) Second PR for just apidocs
         if (10 < javadocFiles.length) {
