@@ -12,6 +12,10 @@
 // ===========================================================================
 
 /*
+input: the PR following https://github.com/jakartaee/specifications/blob/master/.github/PULL_REQUEST_TEMPLATE/pull_request_template.md
+action: perform checks defined in https://github.com/jakartaee/specification-committee/blob/master/spec_review_checklist.md
+output: 'review' property with text output (contains MD)
+
 # Spec Review Checklist
 
 1. Spec PR
@@ -85,6 +89,7 @@
 11. Update Jakarta EE API jar
   - [ ] Update the Jakarta EE API jar by submitting a PR to the jakartaee-api project that updates the version number of your API jar file.
  */
+
 "use strict";
 
 const core = require('@actions/core');
@@ -152,14 +157,14 @@ async function run() {
         console.log(pr_description);
         console.log("");
 
-        let review = "Hello, I'm here to help you checking this pull request for " + spec.name + ", version " + spec.version + "\n\n";
+        let review = "Hello, I'm here to help you checking this pull request for __" + spec.name + "__, version __" + spec.version + "__\n\n";
         review += "# Spec Review Checklist\n\n";
 
         review += "1. Spec PR\n";
 //  - [ ] PR uses [template](https://github.com/jakartaee/specifications/blob/master/pull_request_template.md)
         //check usage of template by counting "- [" in the PR description
         review += mark("PR uses [template](https://github.com/jakartaee/specifications/blob/master/pull_request_template.md)",
-            14 === ((pr_description.match(/- \[/g) || []).length));
+            14 === ((pr_description.match(/- \[/g) || []).length), "The description does not contain expected number of checkboxes");
 //  - [ ] Directory of form {spec}/x.y
         review += mark("Directory of form {spec}/x.y",
             !isEmpty(spec));
@@ -332,7 +337,7 @@ function mark(description, check, comment, force) {
         result += error;
     }
     result += " " + description;
-    if ((force || !check) && comment !== "undefined" && comment !== "") {
+    if ((force || !check) && typeof comment !== "undefined" && comment !== "") {
         result += " _(" + comment + ")_";
     }
     return result + "\n";
